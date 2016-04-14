@@ -1,3 +1,37 @@
 This is a note file that is added to the repository
 Everytime the repository is pushed/pulled this file should be associated
 This file can be used to save information about the progress and track changes
+
+
+Git instructions:
+  to setup git, first create an empty directory where you want your files stored
+  In this directory run the command
+    git init
+
+  Once you have initialized a git repository, link it to the online github
+    git remote add https://github.com/radham95/CMSC436-Project.git
+
+  Additionally, you need to tell git who you are before you can push
+    git config --global user.name "YOUR NAME"
+    git config --global user.email "YOUR EMAIL"
+
+  Once this is done, you can copy the master branch into your repository
+    git pull origin master
+
+Basic git commands:
+  You can track which files have been modified or are not being tracked with
+    git status
+
+  To tell git to log the changes to a file
+    git add FILENAME
+
+  Once you have made changes, commit it to your repository
+    git commit -m "Add a small comment to say what you changed"
+  git will not allow commits without a comment, removing the m flag will open an editor to type a longer comment
+
+  Once you have committed changes to your local repository, push a copy to the master branch
+    git push origin master
+
+  The name master is the name of the default branch in the online repository
+  When the project grows its possible it will include multiple branches,
+  the same commands will work by replacing master with the branch name
