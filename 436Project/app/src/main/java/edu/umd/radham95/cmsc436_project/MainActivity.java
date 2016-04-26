@@ -20,11 +20,14 @@ import java.util.Calendar;
 public class MainActivity extends AppCompatActivity {
     static final String TAG = "Main Activity";
     static final int DAY = 0, WEEK = 1, MONTH = 2, YEAR = 3;
-    static final int DEFAULT_DATE_MODE = DAY;
     DateFormat dateFormat;
     Calendar today;
-    private int dateMode = DEFAULT_DATE_MODE;
+    private int dateMode;
     ToggleButton mToggleDay, mToggleWeek, mToggleMonth, mToggleYear;
+
+    CompoundButton.OnCheckedChangeListener mOnCheckedChangeListener;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,15 +94,27 @@ public class MainActivity extends AppCompatActivity {
     }
 
     void switchMode(int mode){
-        Log.d(TAG, "Date mode changed, switching scenes");
+        Log.d(TAG, "Date mode changed (From " + dateMode + " to " + mode + "), switching scenes");
         dateMode = mode;
 
         // Rebuild scene
+        switchDate();
     }
 
     void switchDate(){
         Log.d(TAG, "Date changed, reloading scene");
         // Rebuild scene
+
+
+        if(dateMode == WEEK) {
+            dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        }else if(dateMode == MONTH) {
+            dateFormat = new SimpleDateFormat("MMMM yyyy");
+        }else if(dateMode == YEAR){
+            dateFormat = new SimpleDateFormat("yyyy");
+        }else{
+            dateFormat = new SimpleDateFormat("EEEE, MM/dd/yyyy");
+        }
 
         String dateString = dateFormat.format(today.getTime());
 
@@ -108,9 +123,60 @@ public class MainActivity extends AppCompatActivity {
         Log.v(TAG, "Today's Date recorded as: " + dateString);
     }
 
+    void LoadData(){
+
+    }
+
     void setupMainScreen(){
         today = Calendar.getInstance();
-        dateFormat = new SimpleDateFormat("MM/dd/yyyy");
+        dateMode = DAY;
+
+        mOnCheckedChangeListener =
+                new CompoundButton.OnCheckedChangeListener(){
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        mToggleDay.setOnCheckedChangeListener(null);
+                        mToggleDay.setChecked(false);
+                        mToggleDay.setBackgroundColor(Color.BLACK);
+                        mToggleDay.setOnCheckedChangeListener(mOnCheckedChangeListener);
+
+                        mToggleWeek.setOnCheckedChangeListener(null);
+                        mToggleWeek.setChecked(false);
+                        mToggleWeek.setBackgroundColor(Color.BLACK);
+                        mToggleWeek.setOnCheckedChangeListener(mOnCheckedChangeListener);
+
+                        mToggleMonth.setOnCheckedChangeListener(null);
+                        mToggleMonth.setChecked(false);
+                        mToggleMonth.setBackgroundColor(Color.BLACK);
+                        mToggleMonth.setOnCheckedChangeListener(mOnCheckedChangeListener);
+
+                        mToggleYear.setOnCheckedChangeListener(null);
+                        mToggleYear.setChecked(false);
+                        mToggleYear.setBackgroundColor(Color.BLACK);
+                        mToggleYear.setOnCheckedChangeListener(mOnCheckedChangeListener);
+
+                        buttonView.setChecked(true);
+                        buttonView.setBackgroundColor(Color.GRAY);
+
+                        if (!isChecked){
+                            Log.v(TAG, "Date mode not changed, it remains the same");
+                        }else{
+                            if (buttonView.getId() == R.id.toggleDay){
+                                switchMode(DAY);
+                            }else if (buttonView.getId() == R.id.toggleWeek){
+                                switchMode(WEEK);
+                            }else if (buttonView.getId() == R.id.toggleMonth){
+                                switchMode(MONTH);
+                            }else if (buttonView.getId() == R.id.toggleYear){
+                                switchMode(YEAR);
+                            }else{
+                                Log.e(TAG, "Unknown toggle referred to onCheckedChangeListener");
+                            }
+                        }
+
+                        Log.d(TAG,"Toggle recorded "+buttonView.getText()+" "+isChecked);
+                    }
+                };
 
         switchDate();
 
@@ -136,29 +202,12 @@ public class MainActivity extends AppCompatActivity {
         mToggleWeek = (ToggleButton) findViewById(R.id.toggleWeek);
         mToggleMonth = (ToggleButton) findViewById(R.id.toggleMonth);
         mToggleYear = (ToggleButton) findViewById(R.id.toggleYear);
-        CompoundButton.OnCheckedChangeListener onCheckedChangeListener =
-                new CompoundButton.OnCheckedChangeListener(){
-                    @Override
-                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        mToggleDay.setBackgroundColor(Color.BLACK);
-                        mToggleWeek.setBackgroundColor(Color.BLACK);
-                        mToggleMonth.setBackgroundColor(Color.BLACK);
-                        mToggleYear.setBackgroundColor(Color.BLACK);
-                        buttonView.setBackgroundColor(Color.GRAY);
 
-                        if (!isChecked){
-                            buttonView.setChecked(true);
-                        }
+        mToggleDay.setOnCheckedChangeListener(mOnCheckedChangeListener);
+        mToggleWeek.setOnCheckedChangeListener(mOnCheckedChangeListener);
+        mToggleMonth.setOnCheckedChangeListener(mOnCheckedChangeListener);
+        mToggleYear.setOnCheckedChangeListener(mOnCheckedChangeListener);
 
-                        Log.d(TAG,"Toggle recorded "+buttonView.getText()+" "+isChecked);
-
-
-                    }
-                };
-
-        mToggleDay.setOnCheckedChangeListener(onCheckedChangeListener);
-        mToggleWeek.setOnCheckedChangeListener(onCheckedChangeListener);
-        mToggleMonth.setOnCheckedChangeListener(onCheckedChangeListener);
-        mToggleYear.setOnCheckedChangeListener(onCheckedChangeListener);
+        mToggleDay.setChecked(true);
     }
 }

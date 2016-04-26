@@ -57,50 +57,6 @@
     </LinearLayout>
 
     <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#000000">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Day"
-            android:id="@+id/dayText"
-            android:layout_weight="1"
-            android:textAlignment="center"
-            android:background="#555555"
-            android:textColor="#FFFFFF" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Week"
-            android:id="@+id/weekText"
-            android:layout_weight="1"
-            android:textAlignment="center"
-            android:textColor="#FFFFFF" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Month"
-            android:id="@+id/monthText"
-            android:layout_weight="1"
-            android:textAlignment="center"
-            android:textColor="#FFFFFF" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Year"
-            android:id="@+id/yearText"
-            android:layout_weight="1"
-            android:textAlignment="center"
-            android:textColor="#ffffff" />
-    </LinearLayout>
-
-    <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
