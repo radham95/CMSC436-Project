@@ -13,6 +13,35 @@
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryDark">
+
+            <ImageButton
+                android:layout_width="32dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/settingsButton"
+                android:src="@android:drawable/ic_menu_preferences"
+                android:background="@color/colorPrimaryDark"
+                android:layout_margin="4dp" />
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@color/colorPrimaryDark"></FrameLayout>
+
+            <ImageButton
+                android:layout_width="32dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/addButton"
+                android:src="@android:drawable/ic_menu_add"
+                android:background="@color/colorPrimaryDark"
+                android:layout_margin="4dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <ToggleButton
@@ -83,7 +112,8 @@
                 android:background="@color/colorPrimary"
                 android:textColor="@color/colorText"
                 android:textSize="20sp"
-                android:id="@+id/dateView" />
+                android:id="@+id/dateView"
+                android:clickable="true" />
 
             <ImageButton
                 android:layout_width="30dp"
