@@ -24,11 +24,12 @@ public class MainActivity extends FragmentActivity {
     static private final int DAY = 0, WEEK = 1, MONTH = 2, YEAR = 3;
     static private final int NUM_MODES = 4;
     private DateFormat dateFormat;
-    private Calendar today;
     private int dateMode;
     private ToggleButton mToggleDay, mToggleWeek, mToggleMonth, mToggleYear;
     private ViewPager mPager;
     private PagerAdapter mPagerAdapter;
+    protected static Model data;
+    protected static Calendar today;
 
     CompoundButton.OnCheckedChangeListener mOnCheckedChangeListener;
 
@@ -44,13 +45,13 @@ public class MainActivity extends FragmentActivity {
         @Override
         public Fragment getItem(int position) {
             if (position == 0) {
-                return new DateFragments.dayFragment();
+                return new DateFragments.DayFragment();
             }else if (position == 1) {
-                return new DateFragments.weekFragment();
+                return new DateFragments.WeekFragment();
             }else if (position == 2) {
-                return new DateFragments.monthFragment();
+                return new DateFragments.MonthFragment();
             }else {
-                return new DateFragments.yearFragment();
+                return new DateFragments.YearFragment();
             }
 
         }
@@ -94,6 +95,16 @@ public class MainActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (savedInstanceState != null){
+            // load data and replace this
+            Log.e(TAG,"Saved state found, but no way to restore it yet");
+            data = new Model();
+        }else{
+            Log.d(TAG, "No saved data found");
+            data = new Model();
+        }
+
         setContentView(R.layout.activity_main);
 
         mPager = (ViewPager) findViewById(R.id.pager);

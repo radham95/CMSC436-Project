@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  * Created by Raymond on 4/26/16.
@@ -91,21 +91,27 @@ public class Model {
      */
     class Day implements Comparable<Day>{
         GregorianCalendar calendar;
-        SortedSet<Meal> todaysMeals;
-        SortedSet<Exercise> todaysExercise;
+        TreeSet<Meal> todaysMeals;
+        TreeSet<Exercise> todaysExercise;
 
         private Day(){
             calendar = new GregorianCalendar();
+            todaysMeals = new TreeSet<>();
+            todaysExercise = new TreeSet<>();
         }
 
         private Day(int year, int month, int dayOfMonth){
             calendar = new GregorianCalendar(year,month,dayOfMonth);
+            todaysMeals = new TreeSet<>();
+            todaysExercise = new TreeSet<>();
         }
 
         private Day(int year, int dayOfYear){
             calendar = new GregorianCalendar();
             calendar.set(Calendar.YEAR, year);
             calendar.set(Calendar.DAY_OF_YEAR, dayOfYear);
+            todaysMeals = new TreeSet<>();
+            todaysExercise = new TreeSet<>();
         }
 
         public boolean addMeal(Meal meal){
@@ -136,6 +142,24 @@ public class Model {
                 ret -= (ex.caloriesPerHour * ex.hours);
             }
 
+            return ret;
+        }
+
+        public Double getCaloriesConsumed(){
+            Double ret = 0.0;
+
+            for(Meal meal: todaysMeals){
+                ret += meal.calories;
+            }
+            return ret;
+        }
+
+        public Double getCaloriesBurned(){
+            Double ret = 0.0;
+
+            for(Exercise ex: todaysExercise){
+                ret += (ex.caloriesPerHour * ex.hours);
+            }
             return ret;
         }
 
@@ -236,6 +260,15 @@ public class Model {
         }
 
         /**
+         * Same as others, this one takes a calendar input instead
+         * @param cal - calendar input
+         * @return found day object or null if none exists
+         */
+        public Day find(Calendar cal){
+            return find(cal.get(Calendar.YEAR), cal.get(Calendar.DAY_OF_YEAR));
+        }
+
+        /**
          * Given a specific date, this returns the first date corresponding to that week
          * If one does not exists it creates one
          * @param year eg 2016
@@ -243,8 +276,10 @@ public class Model {
          * @return a day object representing the first sunday of the week
          */
         private Day findSunday(int year, int dayOfYear){
-            Day today = find(year,dayOfYear);
-            int dayOfWeek = today.dayOfWeek();
+            Calendar today = Calendar.getInstance();
+            today.set(Calendar.YEAR,year);
+            today.set(Calendar.DAY_OF_YEAR,dayOfYear);
+            int dayOfWeek = today.get(Calendar.DAY_OF_WEEK);
 
             dayOfYear -= dayOfWeek - Calendar.SUNDAY;
 
@@ -275,8 +310,10 @@ public class Model {
          * @return a day object representing the first day of the month
          */
         private Day findFirstOfMonth(int year, int dayOfYear){
-            Day today = find(year,dayOfYear);
-            int dayOfMonth = today.calendar.get(Calendar.DAY_OF_MONTH);
+            Calendar today = Calendar.getInstance();
+            today.set(Calendar.YEAR,year);
+            today.set(Calendar.DAY_OF_YEAR,dayOfYear);
+            int dayOfMonth = today.get(Calendar.DAY_OF_MONTH);
 
             dayOfYear -= dayOfMonth - 1;
 
@@ -318,8 +355,8 @@ public class Model {
             return first;
         }
 
-        public LinkedList<Day> getWeek(int year, int month, int day){
-            return getWeek(year, Model.dayMonthYear2DayOfYear(year,month,day));
+        public LinkedList<Day> getWeek(Calendar cal){
+            return getWeek(cal.get(Calendar.YEAR), cal.get(Calendar.DAY_OF_YEAR));
         }
 
         /**
@@ -353,18 +390,21 @@ public class Model {
 
             Day cur;
             for (; i < 7; i++){
-                cur = byTime.get(i);
-                if (cur.calendar.compareTo(weekLater) < 0){
-                    list.add(cur);
+                try {
+                    cur = byTime.get(i);
+                    if (cur != null && cur.calendar.compareTo(weekLater) < 0) {
+                        list.add(cur);
+                    }
+                }catch(IndexOutOfBoundsException e){
+                    Log.d(TAG,"Last day exceeds bounds");
                 }
             }
 
             return list;
         }
 
-        // Day is ignored, but used to keep method overload
-        public LinkedList<Day> getMonth(int year, int month, int day){
-            return getMonth(year,Model.dayMonthYear2DayOfYear(year,month,0));
+        public LinkedList<Day> getMonth(Calendar cal){
+            return getMonth(cal.get(Calendar.YEAR), cal.get(Calendar.DAY_OF_YEAR));
         }
 
         /**
@@ -398,13 +438,21 @@ public class Model {
 
             Day cur;
             for (; i < 31; i++){
-                cur = byTime.get(i);
-                if (cur.calendar.compareTo(monthLater) < 0){
-                    list.add(cur);
+                try{
+                    cur = byTime.get(i);
+                    if (cur != null && cur.calendar.compareTo(monthLater) < 0){
+                        list.add(cur);
+                    }
+                }catch(IndexOutOfBoundsException e){
+                    Log.d(TAG,"Last day exceeds bounds");
                 }
             }
 
             return list;
+        }
+
+        public LinkedList<Day> getYear(Calendar cal){
+            return getYear(cal.get(Calendar.YEAR));
         }
 
         /**
@@ -437,9 +485,13 @@ public class Model {
 
             Day cur;
             for (; i < 366; i++){
-                cur = byTime.get(i);
-                if (cur.calendar.compareTo(monthLater) < 0){
-                    list.add(cur);
+                try {
+                    cur = byTime.get(i);
+                    if (cur != null && cur.calendar.compareTo(monthLater) < 0) {
+                        list.add(cur);
+                    }
+                }catch(IndexOutOfBoundsException e){
+                    Log.d(TAG,"Last day exceeds bounds");
                 }
             }
 
@@ -451,6 +503,14 @@ public class Model {
     static HashMap<String, Exercise> favoriteExercises;
     static DayList dayList;
 
+    /**
+     * Should only be called once per user really
+     */
+    public Model(){
+        favoriteMeals = new HashMap<>();
+        favoriteExercises = new HashMap<>();
+        dayList = new DayList();
+    }
 
     /**
      * Searches the saved favoriteMeals for the given string

@@ -1,9 +1,9 @@
 <resources>
     <string name="app_name">CMSC436-Project</string>
     <string name="action_settings">Settings</string>
-    <string name="calories_remaining">Calories Remaining: </string>
-    <string name="calories_consumed">Calories Consumed: </string>
-    <string name="calories_burned">Calories Burned: </string>
-    <string name="food_consumed">Food Consumed: </string>
-    <string name="exercises_done">Exercises Done: </string>
+    <string name="calories_remaining">Calories Remaining:\u0020</string>
+    <string name="calories_consumed">Calories Consumed:\u0020</string>
+    <string name="calories_burned">Calories Burned:\u0020</string>
+    <string name="food_consumed">\u0020 Food Consumed: </string>
+    <string name="exercises_done">\u0020 Exercises Done: </string>
 </resources>
