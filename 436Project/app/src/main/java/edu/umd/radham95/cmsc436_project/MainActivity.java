@@ -1,12 +1,14 @@
 package edu.umd.radham95.cmsc436_project;
 
-import android.graphics.Color;
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
@@ -17,24 +19,87 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
-public class MainActivity extends AppCompatActivity {
-    static final String TAG = "Main Activity";
-    static final int DAY = 0, WEEK = 1, MONTH = 2, YEAR = 3;
-    DateFormat dateFormat;
-    Calendar today;
+public class MainActivity extends FragmentActivity {
+    static private final String TAG = "Main Activity";
+    static private final int DAY = 0, WEEK = 1, MONTH = 2, YEAR = 3;
+    static private final int NUM_MODES = 4;
+    private DateFormat dateFormat;
+    private Calendar today;
     private int dateMode;
-    ToggleButton mToggleDay, mToggleWeek, mToggleMonth, mToggleYear;
+    private ToggleButton mToggleDay, mToggleWeek, mToggleMonth, mToggleYear;
+    private ViewPager mPager;
+    private PagerAdapter mPagerAdapter;
 
     CompoundButton.OnCheckedChangeListener mOnCheckedChangeListener;
 
+    /**
+     * A simple pager adapter that represents 4 fragments, in
+     * sequence.
+     */
+    private class FragmentPagerAdapter extends FragmentStatePagerAdapter {
+        public FragmentPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
 
+        @Override
+        public Fragment getItem(int position) {
+            if (position == 0) {
+                return new DateFragments.dayFragment();
+            }else if (position == 1) {
+                return new DateFragments.weekFragment();
+            }else if (position == 2) {
+                return new DateFragments.monthFragment();
+            }else {
+                return new DateFragments.yearFragment();
+            }
+
+        }
+
+        @Override
+        public int getCount() {
+            return NUM_MODES;
+        }
+    }
+
+    private class PageListener extends ViewPager.SimpleOnPageChangeListener {
+        public PageListener(){}
+
+        public void onPageSelected(int position) {
+            Log.v(TAG, "page "+position+" selected");
+
+            if (position == 0) {
+                if (dateMode != DAY) {
+                    Log.d(TAG, " Date mode needs to be changed to Day after view changed");
+                    mToggleDay.setChecked(true);
+                }
+            }else if (position == 1) {
+                if (dateMode != WEEK) {
+                    Log.d(TAG, " Date mode needs to be changed to Week after view changed");
+                    mToggleWeek.setChecked(true);
+                }
+            }else if (position == 2) {
+                if (dateMode != MONTH) {
+                    Log.d(TAG, " Date mode needs to be changed to Month after view changed");
+                    mToggleMonth.setChecked(true);
+                }
+            }else{
+                if (dateMode != YEAR) {
+                    Log.d(TAG, " Date mode needs to be changed to Year after view changed");
+                    mToggleYear.setChecked(true);
+                }
+            }
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+
+        mPager = (ViewPager) findViewById(R.id.pager);
+        mPager.addOnPageChangeListener(new PageListener());
+        mPagerAdapter = new FragmentPagerAdapter(getSupportFragmentManager());
+        mPager.setAdapter(mPagerAdapter);
     }
 
     @Override
@@ -44,25 +109,15 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+    public void onBackPressed() {
+        if (mPager.getCurrentItem() == 0) {
+            // If the user is currently looking at the first step, allow the system to handle the
+            // Back button. This calls finish() on this activity and pops the back stack.
+            super.onBackPressed();
+        } else {
+            // Otherwise, select the previous step.
+            mPager.setCurrentItem(mPager.getCurrentItem() - 1);
         }
-
-        return super.onOptionsItemSelected(item);
     }
 
     void decreaseDate(){
@@ -123,10 +178,6 @@ public class MainActivity extends AppCompatActivity {
         Log.v(TAG, "Today's Date recorded as: " + dateString);
     }
 
-    void LoadData(){
-
-    }
-
     void setupMainScreen(){
         today = Calendar.getInstance();
         dateMode = DAY;
@@ -137,26 +188,26 @@ public class MainActivity extends AppCompatActivity {
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                         mToggleDay.setOnCheckedChangeListener(null);
                         mToggleDay.setChecked(false);
-                        mToggleDay.setBackgroundColor(Color.BLACK);
+                        mToggleDay.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary));
                         mToggleDay.setOnCheckedChangeListener(mOnCheckedChangeListener);
 
                         mToggleWeek.setOnCheckedChangeListener(null);
                         mToggleWeek.setChecked(false);
-                        mToggleWeek.setBackgroundColor(Color.BLACK);
+                        mToggleWeek.setBackgroundColor(ContextCompat.getColor(getApplicationContext(),R.color.colorPrimary));
                         mToggleWeek.setOnCheckedChangeListener(mOnCheckedChangeListener);
 
                         mToggleMonth.setOnCheckedChangeListener(null);
                         mToggleMonth.setChecked(false);
-                        mToggleMonth.setBackgroundColor(Color.BLACK);
+                        mToggleMonth.setBackgroundColor(ContextCompat.getColor(getApplicationContext(),R.color.colorPrimary));
                         mToggleMonth.setOnCheckedChangeListener(mOnCheckedChangeListener);
 
                         mToggleYear.setOnCheckedChangeListener(null);
                         mToggleYear.setChecked(false);
-                        mToggleYear.setBackgroundColor(Color.BLACK);
+                        mToggleYear.setBackgroundColor(ContextCompat.getColor(getApplicationContext(),R.color.colorPrimary));
                         mToggleYear.setOnCheckedChangeListener(mOnCheckedChangeListener);
 
                         buttonView.setChecked(true);
-                        buttonView.setBackgroundColor(Color.GRAY);
+                        buttonView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(),R.color.hilight));
 
                         if (!isChecked){
                             Log.v(TAG, "Date mode not changed, it remains the same");
@@ -175,6 +226,7 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         Log.d(TAG,"Toggle recorded "+buttonView.getText()+" "+isChecked);
+                        mPager.setCurrentItem(dateMode);
                     }
                 };
 
