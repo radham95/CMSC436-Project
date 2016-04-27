@@ -1,5 +1,8 @@
 package edu.umd.radham95.cmsc436_project;
 
+import android.app.Activity;
+import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -10,7 +13,10 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.ToggleButton;
@@ -23,6 +29,8 @@ public class MainActivity extends FragmentActivity {
     static private final String TAG = "Main Activity";
     static private final int DAY = 0, WEEK = 1, MONTH = 2, YEAR = 3;
     static private final int NUM_MODES = 4;
+    static private final int SETTINGS_REQUEST = 0;
+    static private final int ADD_REQUEST = 1;
     private DateFormat dateFormat;
     private int dateMode;
     private ToggleButton mToggleDay, mToggleWeek, mToggleMonth, mToggleYear;
@@ -133,7 +141,7 @@ public class MainActivity extends FragmentActivity {
 
     void decreaseDate(){
         if (dateMode == DAY){
-            today.add(Calendar.DAY_OF_YEAR,-1);
+            today.add(Calendar.DAY_OF_YEAR, -1);
         }else if(dateMode == WEEK) {
             today.add(Calendar.WEEK_OF_YEAR, -1);
         }else if(dateMode == MONTH) {
@@ -272,5 +280,81 @@ public class MainActivity extends FragmentActivity {
         mToggleYear.setOnCheckedChangeListener(mOnCheckedChangeListener);
 
         mToggleDay.setChecked(true);
+
+        ImageButton settingsButton = (ImageButton) findViewById(R.id.settingsButton);
+        ImageButton addButton = (ImageButton) findViewById(R.id.addButton);
+
+        settingsButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Intent settingsIntent = new Intent();
+                startActivityForResult(settingsIntent,SETTINGS_REQUEST);
+            }
+        });
+
+        addButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Intent addIntent = new Intent();
+                startActivityForResult(addIntent,ADD_REQUEST);
+            }
+        });
+
+        TextView dateView = (TextView) findViewById(R.id.dateView);
+        /*
+        This is not working so Im not going to bother
+        dateView.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Log.v(TAG,"Registered click for date TextView, launching dialog");
+                final DateDialog dialog = new DateDialog();
+                dialog.showDialog(MainActivity.this);
+            }
+        });
+        */
+
+    }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data){
+        if (requestCode == SETTINGS_REQUEST){
+            if (resultCode == RESULT_OK){
+
+            }
+        }else if(requestCode == ADD_REQUEST){
+            if (resultCode == RESULT_OK){
+
+            }
+        }
+        Log.d(TAG,"Unknown Request Code ("+requestCode+") or bad Result Code ("+resultCode+")");
+    }
+
+    public class DateDialog {
+
+        public void showDialog(Activity activity){
+            final Dialog dialog = new Dialog(activity);
+            dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            dialog.setContentView(R.layout.date_picker);
+
+            Button dateButton = (Button)
+                    findViewById(R.id.dateButton);
+            dateButton.setOnClickListener(new View.OnClickListener(){
+                @Override
+                public void onClick(View v) {
+                    DatePicker datePicker = (DatePicker) findViewById(R.id.datePicker);
+                    int day = datePicker.getDayOfMonth();
+                    int month = datePicker.getMonth();
+                    int year = datePicker.getYear();
+
+                    today.set(Calendar.YEAR, year);
+                    today.set(Calendar.MONTH, month);
+                    today.set(Calendar.DAY_OF_MONTH, day);
+                }
+            });
+
+            dialog.show();
+
+        }
     }
 }
