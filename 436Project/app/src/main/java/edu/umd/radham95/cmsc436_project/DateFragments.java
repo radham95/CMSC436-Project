@@ -42,7 +42,7 @@ public class DateFragments {
                     TextView caloriesConsumedView = (TextView) rootView.findViewById(R.id.caloriesConsumedView);
                     TextView caloriesView = (TextView) rootView.findViewById(R.id.caloriesView);
 
-                    caloriesView.setText(day.getCalories().toString());
+                    caloriesView.setText(((day.getCalories() - MainActivity.data.calPerDay)+""));
                     caloriesConsumedView.setText(day.getCaloriesConsumed().toString());
                     caloriesBurnedView.setText(day.getCaloriesBurned().toString());
                 }

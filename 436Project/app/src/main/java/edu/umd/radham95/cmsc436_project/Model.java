@@ -19,6 +19,7 @@ public class Model {
     public final static Double DEFAULT_EXERCISE_TIME = 1.0;
     public final static String MODEL_KEY = "MODEL";
     public final static String TAG = "Model";
+    double calPerDay = 2000;
 
     /**
      * Converts date in the format of year, month, day to the number

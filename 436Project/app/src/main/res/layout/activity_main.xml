@@ -39,6 +39,8 @@
                 android:layout_margin="4dp" />
         </LinearLayout>
 
+
+
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
@@ -112,8 +114,7 @@
                 android:background="@color/colorPrimary"
                 android:textColor="@color/colorText"
                 android:textSize="20sp"
-                android:id="@+id/dateView"
-                android:clickable="true" />
+                android:id="@+id/dateView" />
 
             <ImageButton
                 android:layout_width="30dp"

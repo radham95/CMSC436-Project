@@ -1,5 +1,7 @@
 package edu.umd.radham95.cmsc436_project;
 
+import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,9 +13,13 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.DatePicker;
 import android.widget.ImageButton;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import java.text.DateFormat;
@@ -282,8 +288,9 @@ public class MainActivity extends FragmentActivity {
         settingsButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                Intent settingsIntent = new Intent();
+               Intent settingsIntent = new Intent(MainActivity.this, Settings.class);
                 startActivityForResult(settingsIntent,SETTINGS_REQUEST);
+
             }
         });
 
@@ -295,6 +302,10 @@ public class MainActivity extends FragmentActivity {
             }
         });
 
+        TextView dateView = (TextView) findViewById(R.id.dateView);
+
+
+
     }
 
 
@@ -303,6 +314,13 @@ public class MainActivity extends FragmentActivity {
         if (requestCode == SETTINGS_REQUEST){
             if (resultCode == RESULT_OK){
 
+                Toast t = Toast.makeText(getApplicationContext(), "Received Calories per day", Toast.LENGTH_SHORT);
+
+                if(data.getDoubleExtra("calsPerDay", -1.0) != -1) {
+
+                    t.show();
+                    this.data.calPerDay =(data.getDoubleExtra("calsPerDay", -1.0));
+                }
             }
         }else if(requestCode == ADD_REQUEST){
             if (resultCode == RESULT_OK){
@@ -311,5 +329,6 @@ public class MainActivity extends FragmentActivity {
         }
         Log.d(TAG,"Unknown Request Code ("+requestCode+") or bad Result Code ("+resultCode+")");
     }
+
 
 }
