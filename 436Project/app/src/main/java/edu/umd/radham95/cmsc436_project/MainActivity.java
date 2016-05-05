@@ -1,7 +1,5 @@
 package edu.umd.radham95.cmsc436_project;
 
-import android.app.Activity;
-import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -13,11 +11,9 @@ import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
-import android.view.Window;
-import android.widget.Button;
 import android.widget.CompoundButton;
-import android.widget.DatePicker;
 import android.widget.ImageButton;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -28,17 +24,21 @@ import java.util.Calendar;
 
 public class MainActivity extends FragmentActivity {
     static private final String TAG = "Main Activity";
-    static private final int DAY = 0, WEEK = 1, MONTH = 2, YEAR = 3;
+    static protected final int DAY = 0, WEEK = 1, MONTH = 2, YEAR = 3;
     static private final int NUM_MODES = 4;
     static private final int SETTINGS_REQUEST = 0;
     static private final int ADD_REQUEST = 1;
     private DateFormat dateFormat;
-    private int dateMode;
+    protected int dateMode;
     private ToggleButton mToggleDay, mToggleWeek, mToggleMonth, mToggleYear;
     private ViewPager mPager;
     private PagerAdapter mPagerAdapter;
-    protected static Model data;
     protected static Calendar today;
+    protected Double goal = 2000.0;
+    private DayList dayList;
+
+    EntryAdapter mAdapter;
+    ListView list;
 
     CompoundButton.OnCheckedChangeListener mOnCheckedChangeListener;
 
@@ -68,6 +68,11 @@ public class MainActivity extends FragmentActivity {
         @Override
         public int getCount() {
             return NUM_MODES;
+        }
+
+        @Override
+        public int getItemPosition(Object object) {
+            return POSITION_NONE;
         }
     }
 
@@ -108,10 +113,10 @@ public class MainActivity extends FragmentActivity {
         if (savedInstanceState != null){
             // load data and replace this
             Log.e(TAG,"Saved state found, but no way to restore it yet");
-            data = new Model();
+            dayList = new DayList();
         }else{
             Log.d(TAG, "No saved data found");
-            data = new Model();
+            dayList = new DayList();
         }
 
         setContentView(R.layout.activity_main);
@@ -120,6 +125,13 @@ public class MainActivity extends FragmentActivity {
         mPager.addOnPageChangeListener(new PageListener());
         mPagerAdapter = new FragmentPagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
+
+        mAdapter = new EntryAdapter(getApplicationContext());
+        list = (ListView)findViewById(R.id.list);
+//
+//        TextView footerView = (TextView) getLayoutInflater().inflate(R.layout.footer_view, null);
+//        list.addFooterView(footerView);
+//        list.setAdapter(mAdapter);
     }
 
     @Override
@@ -196,6 +208,9 @@ public class MainActivity extends FragmentActivity {
         TextView dateView = (TextView) findViewById(R.id.dateView);
         dateView.setText(dateString);
         Log.v(TAG, "Today's Date recorded as: " + dateString);
+
+        // updates display
+        mPager.setAdapter(mPagerAdapter);
     }
 
     void setupMainScreen(){
@@ -285,11 +300,11 @@ public class MainActivity extends FragmentActivity {
         ImageButton settingsButton = (ImageButton) findViewById(R.id.settingsButton);
         ImageButton addButton = (ImageButton) findViewById(R.id.addButton);
 
-        settingsButton.setOnClickListener(new View.OnClickListener(){
+        settingsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-               Intent settingsIntent = new Intent(MainActivity.this, Settings.class);
-                startActivityForResult(settingsIntent,SETTINGS_REQUEST);
+                Intent settingsIntent = new Intent(MainActivity.this, Settings.class);
+                startActivityForResult(settingsIntent, SETTINGS_REQUEST);
 
             }
         });
@@ -297,37 +312,53 @@ public class MainActivity extends FragmentActivity {
         addButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                Intent addIntent = new Intent();
-                startActivityForResult(addIntent,ADD_REQUEST);
+                Intent addIntent = new Intent(MainActivity.this, AddEntryActivity.class);
+                startActivityForResult(addIntent, ADD_REQUEST);
             }
         });
 
         TextView dateView = (TextView) findViewById(R.id.dateView);
-
-
-
     }
 
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data){
-        if (requestCode == SETTINGS_REQUEST){
-            if (resultCode == RESULT_OK){
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent){
+        if (resultCode == RESULT_OK){
+            if (requestCode == SETTINGS_REQUEST){
+                double goalInput = intent.getDoubleExtra("calsPerDay", -1.0);
 
-                Toast t = Toast.makeText(getApplicationContext(), "Received Calories per day", Toast.LENGTH_SHORT);
-
-                if(data.getDoubleExtra("calsPerDay", -1.0) != -1) {
-
+                if(goalInput != -1) {
                     t.show();
-                    this.data.calPerDay =(data.getDoubleExtra("calsPerDay", -1.0));
-                }
-            }
-        }else if(requestCode == ADD_REQUEST){
-            if (resultCode == RESULT_OK){
+                    Toast t = Toast.makeText(getApplicationContext(), "Changing goal to "+goalInput, Toast.LENGTH_SHORT);
+                    Log.d(TAG, "Setting goal as " + goalInput);
+                    this.goal = goalInput;
 
+                    // updates display
+                    mPager.setAdapter(mPagerAdapter);
+                }
+
+            }else if(requestCode == ADD_REQUEST){
+                Log.d(TAG, "revieved new data to the main activity");
+                Meal meal = new Meal(intent);
+                mAdapter.add(meal);
+                DayList.Day day = dayList.find(today);
+
+                if (day == null){
+                    Log.d(TAG, "Could not find day, must create one");
+                    day = Model.dayList.createNewDay(today);
+                }
+
+                day.addMeal(intent);
+
+                Log.d(TAG, "Updating display to include new data");
+                // updates display
+                //mPager.setAdapter(mPagerAdapter);
+            }else{
+                Log.e(TAG, "Unknown result code");
             }
+        }else {
+            Log.d(TAG, "Bad result received");
         }
-        Log.d(TAG,"Unknown Request Code ("+requestCode+") or bad Result Code ("+resultCode+")");
     }
 
 

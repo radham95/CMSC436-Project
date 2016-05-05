@@ -6,4 +6,13 @@
     <string name="calories_burned">Calories Burned:\u0020</string>
     <string name="food_consumed">\u0020 Food Consumed: </string>
     <string name="exercises_done">\u0020 Exercises Done: </string>
+    <string-array name="food_array">
+        <item>Apple [95]</item>
+        <item>Coffee [45]</item>
+        <item>Candy [148]</item>
+        <item>Orange [45]</item>
+        <item>Spaghetti [450]</item>
+        <item>Banana [105]</item>
+        <item>Tiramisu [500]</item>
+    </string-array>
 </resources>

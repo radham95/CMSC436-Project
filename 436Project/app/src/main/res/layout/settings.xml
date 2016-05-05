@@ -48,7 +48,7 @@
         android:layout_below="@+id/seekBar2"
         android:layout_alignParentRight="true"
         android:layout_gravity="center"
-        android:background="#ef1726"
+        android:background="#7280CE"
         android:layout_marginBottom="20dp"
         android:layout_marginRight="10dp"
         android:layout_marginTop="2dp" />
@@ -69,7 +69,7 @@
         android:layout_below="@+id/editText4"
         android:layout_alignParentRight="true"
         android:layout_gravity="center"
-        android:background="#ef1726"
+        android:background="#7280CE"
         android:layout_marginBottom="25dp"
         android:layout_marginRight="10dp" />
     
@@ -90,7 +90,7 @@
         android:layout_alignParentRight="true"
         android:layout_below="@+id/editText5"
         android:layout_gravity="center"
-        android:background="#ef1726"
+        android:background="#7280CE"
         android:layout_marginBottom="20dp"
         android:layout_marginRight="10dp" />
 
@@ -147,7 +147,7 @@ android:max = "100"
         android:layout_below="@+id/seekBar"
         android:layout_alignParentRight="true"
         android:layout_gravity="center"
-        android:background="#ef1726"
+        android:background="#7280CE"
         android:layout_marginBottom="25dp"
         android:layout_marginRight="10dp" />
 
@@ -183,7 +183,9 @@ android:max = "100"
         android:text="Submit"
         android:layout_below="@+id/calories"
         android:layout_marginBottom="44dp"
-        android:layout_marginTop="25dp" />
+        android:layout_marginTop="25dp"
+        android:background="#303F9F"
+        android:textColor="#ffffff" />
 
 
 

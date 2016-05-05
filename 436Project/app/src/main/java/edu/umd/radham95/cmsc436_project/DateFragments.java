@@ -6,6 +6,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
 
 import java.util.LinkedList;
@@ -24,6 +26,12 @@ public class DateFragments {
             super();
         }
 
+        public void upDateCalories(){
+            rootView = (ViewGroup) LayoutInflater.from(getContext()).inflate(R.layout.day_fragment, null, false);
+
+        }
+
+
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
                                  Bundle savedInstanceState) {
@@ -34,17 +42,34 @@ public class DateFragments {
 
             if(MainActivity.data != null){
                 Model.Day day = MainActivity.data.dayList.find(MainActivity.today);
+                TextView caloriesBurnedView = (TextView) rootView.findViewById(R.id.caloriesBurnedView);
+                TextView caloriesConsumedView = (TextView) rootView.findViewById(R.id.caloriesConsumedView);
+                TextView caloriesView = (TextView) rootView.findViewById(R.id.caloriesView);
+
+                TableLayout table = (TableLayout) rootView.findViewById(R.id.dayTableMeals);
+
                 if (day == null){
                     Log.d(TAG,"Data has been initialized, but no information is present for this day");
-                }else {
-                    Log.v(TAG,"Found data to display for this day");
-                    TextView caloriesBurnedView = (TextView) rootView.findViewById(R.id.caloriesBurnedView);
-                    TextView caloriesConsumedView = (TextView) rootView.findViewById(R.id.caloriesConsumedView);
-                    TextView caloriesView = (TextView) rootView.findViewById(R.id.caloriesView);
+                    Log.v(TAG, "Calories remaining saved as: " + (MainActivity.data.goal - 0));
+                    caloriesView.setText(((MainActivity.data.goal) + ""));
+                    caloriesConsumedView.setText("0");
+                    caloriesBurnedView.setText("0");
 
-                    caloriesView.setText(((day.getCalories() - MainActivity.data.calPerDay)+""));
+                }else{
+                    Log.v(TAG,"Found data to display for this day");
+
+                    Log.v(TAG, "Calories remaining saved as: " + (MainActivity.data.goal - day.getCalories()));
+                    caloriesView.setText(((MainActivity.data.goal - day.getCalories())+""));
                     caloriesConsumedView.setText(day.getCaloriesConsumed().toString());
                     caloriesBurnedView.setText(day.getCaloriesBurned().toString());
+
+                    for (Model.Meal meal: day.getMeals()){
+                        TableRow row = (TableRow) LayoutInflater.from(rootView.getContext()).inflate(R.layout.row_in_table,null);
+                        ((TextView)row.findViewById(R.id.row_name)).setText(meal.name);
+                        ((TextView)row.findViewById(R.id.row_value)).setText(meal.calories.toString());
+                        Log.d(TAG,"Adding "+meal.name+" with "+meal.calories+" calories to the table");
+                        table.addView(row);
+                    }
                 }
 
             }

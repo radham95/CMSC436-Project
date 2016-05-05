@@ -1,15 +1,16 @@
 package edu.umd.radham95.cmsc436_project;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.TreeSet;
 
 /**
  * Created by Raymond on 4/26/16.
@@ -19,7 +20,6 @@ public class Model {
     public final static Double DEFAULT_EXERCISE_TIME = 1.0;
     public final static String MODEL_KEY = "MODEL";
     public final static String TAG = "Model";
-    double calPerDay = 2000;
 
     /**
      * Converts date in the format of year, month, day to the number
@@ -59,6 +59,7 @@ public class Model {
             this.name = name;
             this.calories = calories;
         }
+
     }
 
     /**
@@ -92,30 +93,50 @@ public class Model {
      */
     class Day implements Comparable<Day>{
         GregorianCalendar calendar;
-        TreeSet<Meal> todaysMeals;
-        TreeSet<Exercise> todaysExercise;
+        LinkedList<Meal> todaysMeals;
+        LinkedList<Exercise> todaysExercise;
 
         private Day(){
             calendar = new GregorianCalendar();
-            todaysMeals = new TreeSet<>();
-            todaysExercise = new TreeSet<>();
+            todaysMeals = new LinkedList<>();
+            todaysExercise = new LinkedList<>();
+            Log.d(TAG,"CREATING NEW DAY");
         }
 
         private Day(int year, int month, int dayOfMonth){
             calendar = new GregorianCalendar(year,month,dayOfMonth);
-            todaysMeals = new TreeSet<>();
-            todaysExercise = new TreeSet<>();
+            todaysMeals = new LinkedList<>();
+            todaysExercise = new LinkedList<>();
+            Log.d(TAG,"CREATING NEW DAY");
         }
 
         private Day(int year, int dayOfYear){
             calendar = new GregorianCalendar();
             calendar.set(Calendar.YEAR, year);
             calendar.set(Calendar.DAY_OF_YEAR, dayOfYear);
-            todaysMeals = new TreeSet<>();
-            todaysExercise = new TreeSet<>();
+            todaysMeals = new LinkedList<>();
+            todaysExercise = new LinkedList<>();
+            Log.d(TAG,"CREATING NEW DAY");
+        }
+
+        private Day(Calendar calendar){
+            this.calendar = new GregorianCalendar();
+            todaysMeals = new LinkedList<>();
+            todaysExercise = new LinkedList<>();
+
+            this.calendar.set(Calendar.YEAR, calendar.get(Calendar.YEAR));
+            this.calendar.set(Calendar.DAY_OF_YEAR, calendar.get(Calendar.DAY_OF_YEAR));
+            Log.d(TAG,"CREATING NEW DAY");
+        }
+
+        public boolean addMeal(Intent intent){
+            String name = intent.getStringExtra("Label");
+            Double calories = Double.parseDouble(intent.getStringExtra("Calories"));
+            return addMeal(new Meal(name,calories));
         }
 
         public boolean addMeal(Meal meal){
+            Log.d(TAG,"Adding meal "+meal.name+" to day "+(new SimpleDateFormat("EEEE, MM/dd/yyyy")).format(calendar.getTime()));
             return todaysMeals.add(meal);
         }
 
@@ -133,6 +154,7 @@ public class Model {
          * @return caloric intake (Calories consumed - calories burned)
          */
         public Double getCalories(){
+            Log.d(TAG, "total meals for the day: "+todaysMeals.size() + " exercise:"+ todaysMeals.size());
             Double ret = 0.0;
 
             for(Meal meal: todaysMeals){
@@ -196,6 +218,22 @@ public class Model {
                 }
             }
         }
+
+        public LinkedList<Meal> getMeals(){
+            Log.d(TAG,"Getting meals("+todaysMeals.size()+
+                    ") for "+(new SimpleDateFormat("EEEE, MM/dd/yyyy")).format(calendar.getTime()));
+            return (LinkedList<Meal>) todaysMeals.clone();
+        }
+
+        public LinkedList<Exercise> getExercise(){
+            return (LinkedList<Exercise>) todaysExercise.clone();
+        }
+
+        @Override
+        public String toString() {
+;           return ""+(new SimpleDateFormat("EEEE, MM/dd/yyyy")).format(calendar.getTime())+" ("+
+                    todaysMeals.size()+","+todaysExercise+")";
+        }
     }
 
     /**
@@ -239,14 +277,19 @@ public class Model {
          * @return a new Day with the specified date and added to the calendar
          */
         public Day createNewDay(int year,int dayOfYear){
+            Log.d(TAG,"Creating new day");
             Day today = new Day(year,dayOfYear);
             Long key = getKey(today);
             byName.put(key,today);
             return today;
         }
 
+        public Day createNewDay(Calendar cal){
+            return createNewDay(cal.get(Calendar.YEAR),cal.get(Calendar.DAY_OF_YEAR));
+        }
+
         public Day find(int year, int month, int day){
-            return find(year, Model.dayMonthYear2DayOfYear(year,month,day));
+            return find(year, Model.dayMonthYear2DayOfYear(year, month, day));
         }
 
         /**
@@ -390,15 +433,16 @@ public class Model {
             weekLater.set(Calendar.SECOND, 59);
 
             Day cur;
-            for (; i < 7; i++){
-                try {
+            try {
+                for (; i < 7; i++) {
                     cur = byTime.get(i);
                     if (cur != null && cur.calendar.compareTo(weekLater) < 0) {
                         list.add(cur);
                     }
-                }catch(IndexOutOfBoundsException e){
-                    Log.d(TAG,"Last day exceeds bounds");
                 }
+            }
+            catch(IndexOutOfBoundsException e){
+            Log.d(TAG,"Last day exceeds bounds");
             }
 
             return list;
@@ -438,15 +482,16 @@ public class Model {
             monthLater.set(Calendar.SECOND, 59);
 
             Day cur;
-            for (; i < 31; i++){
-                try{
+            try {
+                for (; i < 31; i++) {
                     cur = byTime.get(i);
-                    if (cur != null && cur.calendar.compareTo(monthLater) < 0){
+                    if (cur != null && cur.calendar.compareTo(monthLater) < 0) {
                         list.add(cur);
                     }
-                }catch(IndexOutOfBoundsException e){
-                    Log.d(TAG,"Last day exceeds bounds");
                 }
+            }
+            catch(IndexOutOfBoundsException e){
+                Log.d(TAG,"Last day exceeds bounds");
             }
 
             return list;
@@ -476,24 +521,25 @@ public class Model {
 
             int i = byTime.indexOf(first);
 
-            Calendar monthLater = (Calendar) first.calendar.clone();
-            monthLater.add(Calendar.YEAR,1);
+            Calendar yearLater = (Calendar) first.calendar.clone();
+            yearLater.add(Calendar.YEAR,1);
             //For sanity
-            monthLater.add(Calendar.DAY_OF_YEAR,-1);
-            monthLater.set(Calendar.HOUR,23);
-            monthLater.set(Calendar.MINUTE, 59);
-            monthLater.set(Calendar.SECOND, 59);
+            yearLater.add(Calendar.DAY_OF_YEAR,-1);
+            yearLater.set(Calendar.HOUR,23);
+            yearLater.set(Calendar.MINUTE, 59);
+            yearLater.set(Calendar.SECOND, 59);
 
             Day cur;
-            for (; i < 366; i++){
-                try {
+            try {
+                for (; i < 366; i++) {
                     cur = byTime.get(i);
-                    if (cur != null && cur.calendar.compareTo(monthLater) < 0) {
+                    if (cur != null && cur.calendar.compareTo(yearLater) < 0) {
                         list.add(cur);
                     }
-                }catch(IndexOutOfBoundsException e){
-                    Log.d(TAG,"Last day exceeds bounds");
                 }
+            }
+            catch(IndexOutOfBoundsException e){
+                Log.d(TAG,"Last day exceeds bounds");
             }
 
             return list;
@@ -503,6 +549,7 @@ public class Model {
     static HashMap<String, Meal> favoriteMeals;
     static HashMap<String, Exercise> favoriteExercises;
     static DayList dayList;
+    static double goal = 2000;
 
     /**
      * Should only be called once per user really
@@ -511,6 +558,8 @@ public class Model {
         favoriteMeals = new HashMap<>();
         favoriteExercises = new HashMap<>();
         dayList = new DayList();
+        double goal = 2000;
+        Log.d(TAG, "THIS SHOULD ONLY BE CALLED ONCE PER EXECUTION");
     }
 
     /**

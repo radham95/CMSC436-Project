@@ -1,5 +1,6 @@
 <!-- day_fragment.xml -->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/dayFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
@@ -77,7 +78,7 @@
         <LinearLayout
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_margin="16dp"
             android:background="@color/light">
 
@@ -90,6 +91,13 @@
                 android:textColor="@color/colorText"
                 android:background="@color/colorPrimary"
                 android:layout_marginBottom="16dp" />
+
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/dayTableMeals"></TableLayout>
+
+            <!-- <include layout="@layout/footer_view" /> -->
         </LinearLayout>
 
         <LinearLayout
