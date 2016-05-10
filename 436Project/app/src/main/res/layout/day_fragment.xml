@@ -89,13 +89,12 @@
                 android:text="@string/food_consumed"
                 android:id="@+id/textView3"
                 android:textColor="@color/colorText"
-                android:background="@color/colorPrimary"
-                android:layout_marginBottom="16dp" />
+                android:background="@color/colorPrimary" />
 
             <TableLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:id="@+id/dayTableMeals"></TableLayout>
+                android:id="@+id/dayMealsTable"></TableLayout>
 
             <!-- <include layout="@layout/footer_view" /> -->
         </LinearLayout>
@@ -114,8 +113,12 @@
                 android:text="@string/exercises_done"
                 android:id="@+id/textView4"
                 android:textColor="@color/colorText"
-                android:background="@color/colorPrimary"
-                android:layout_marginBottom="16dp" />
+                android:background="@color/colorPrimary" />
+
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/dayExerciseTable" />
 
         </LinearLayout>
 

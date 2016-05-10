@@ -29,13 +29,13 @@ public class MainActivity extends FragmentActivity {
     static private final int SETTINGS_REQUEST = 0;
     static private final int ADD_REQUEST = 1;
     private DateFormat dateFormat;
-    protected int dateMode;
+    protected static int dateMode;
     private ToggleButton mToggleDay, mToggleWeek, mToggleMonth, mToggleYear;
-    private ViewPager mPager;
-    private PagerAdapter mPagerAdapter;
-    protected static Calendar today;
-    protected Double goal = 2000.0;
-    private DayList dayList;
+    static private ViewPager mPager;
+    static private PagerAdapter mPagerAdapter;
+    static protected Calendar today;
+    static protected double goal = 2000.0;
+    static protected DayList dayList;
 
     EntryAdapter mAdapter;
     ListView list;
@@ -122,6 +122,7 @@ public class MainActivity extends FragmentActivity {
         setContentView(R.layout.activity_main);
 
         mPager = (ViewPager) findViewById(R.id.pager);
+        mPager.setOffscreenPageLimit(4);
         mPager.addOnPageChangeListener(new PageListener());
         mPagerAdapter = new FragmentPagerAdapter(getSupportFragmentManager());
         mPager.setAdapter(mPagerAdapter);
@@ -184,7 +185,6 @@ public class MainActivity extends FragmentActivity {
         Log.d(TAG, "Date mode changed (From " + dateMode + " to " + mode + "), switching scenes");
         dateMode = mode;
 
-        // Rebuild scene
         switchDate();
     }
 
@@ -208,9 +208,6 @@ public class MainActivity extends FragmentActivity {
         TextView dateView = (TextView) findViewById(R.id.dateView);
         dateView.setText(dateString);
         Log.v(TAG, "Today's Date recorded as: " + dateString);
-
-        // updates display
-        mPager.setAdapter(mPagerAdapter);
     }
 
     void setupMainScreen(){
@@ -273,6 +270,7 @@ public class MainActivity extends FragmentActivity {
             public void onClick(View v) {
                 decreaseDate();
                 switchDate();
+                updateFragments();
             }
         });
 
@@ -282,6 +280,7 @@ public class MainActivity extends FragmentActivity {
             public void onClick(View v){
                 increaseDate();
                 switchDate();
+                updateFragments();
             }
         });
 
@@ -328,16 +327,15 @@ public class MainActivity extends FragmentActivity {
                 double goalInput = intent.getDoubleExtra("calsPerDay", -1.0);
 
                 if(goalInput != -1) {
-                    t.show();
                     Toast t = Toast.makeText(getApplicationContext(), "Changing goal to "+goalInput, Toast.LENGTH_SHORT);
+                    t.show();
                     Log.d(TAG, "Setting goal as " + goalInput);
                     this.goal = goalInput;
 
-                    // updates display
-                    mPager.setAdapter(mPagerAdapter);
+                    updateFragments();
                 }
 
-            }else if(requestCode == ADD_REQUEST){
+            }else if(requestCode == ADD_REQUEST) {
                 Log.d(TAG, "revieved new data to the main activity");
                 Meal meal = new Meal(intent);
                 mAdapter.add(meal);
@@ -345,14 +343,13 @@ public class MainActivity extends FragmentActivity {
 
                 if (day == null){
                     Log.d(TAG, "Could not find day, must create one");
-                    day = Model.dayList.createNewDay(today);
+                    day = dayList.createNewDay(today);
                 }
 
                 day.addMeal(intent);
 
                 Log.d(TAG, "Updating display to include new data");
-                // updates display
-                //mPager.setAdapter(mPagerAdapter);
+                updateFragments();
             }else{
                 Log.e(TAG, "Unknown result code");
             }
@@ -361,5 +358,8 @@ public class MainActivity extends FragmentActivity {
         }
     }
 
-
+    public static void updateFragments(){
+        Log.d(TAG,"Updating Fragments");
+        mPager.setAdapter(mPagerAdapter);
+    }
 }
