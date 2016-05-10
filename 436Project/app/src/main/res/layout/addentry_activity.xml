@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <ToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add Meal"
+            android:id="@+id/toggleMeal"
+            android:layout_weight="1"
+            android:background="@color/hilight"
+            android:textColor="@color/colorText"
+            android:textOff="Add Meal"
+            android:textOn="Add Meal"
+            android:checked="false" />
+
+        <ToggleButton
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add Exercise"
+            android:id="@+id/toggleExercise"
+            android:layout_weight="1"
+            android:background="@color/colorPrimary"
+            android:textColor="@color/colorText"
+            android:textOff="Add Exercise"
+            android:textOn="Add Exercise" />
+
+    </LinearLayout>
+
+    <android.support.v4.view.ViewPager
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</LinearLayout>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:weightSum="1">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Exercise:"
+        android:id="@+id/exerciseTextView"
+        android:textColor="#ffffff"
+        android:layout_marginTop="20sp"
+        android:layout_marginLeft="20sp"
+        android:layout_marginRight="20sp"
+        android:paddingTop="4sp"
+        android:paddingLeft="10sp"
+        android:background="@color/colorPrimary" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/exerciseEditText"
+        android:layout_marginLeft="20sp"
+        android:layout_marginRight="20sp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Enter calories burned per hour:"
+        android:id="@+id/caloriesBurnedTextView"
+        android:textColor="#ffffff"
+        android:layout_marginTop="25sp"
+        android:layout_marginLeft="20sp"
+        android:layout_marginRight="20sp"
+        android:background="@color/colorPrimary"
+        android:paddingTop="4sp"
+        android:paddingLeft="10sp" />
+
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/caloriesBurnedEditText"
+        android:layout_marginLeft="20sp"
+        android:layout_marginRight="20sp" />
+
+    <Button
+        android:layout_width="108dp"
+        android:layout_height="28dp"
+        android:text="Submit"
+        android:id="@+id/submitExercise"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="0.09"
+        android:background="#303F9F"
+        android:textColor="#ffffff"
+        android:layout_marginTop="25sp"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
+</LinearLayout>

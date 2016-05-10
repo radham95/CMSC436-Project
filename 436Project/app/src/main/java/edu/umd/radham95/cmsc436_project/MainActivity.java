@@ -21,6 +21,7 @@ import android.widget.ToggleButton;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.List;
 
 public class MainActivity extends FragmentActivity {
     static private final String TAG = "Main Activity";
@@ -36,8 +37,9 @@ public class MainActivity extends FragmentActivity {
     static protected Calendar today;
     static protected double goal = 2000.0;
     static protected DayList dayList;
+    static protected DatabaseHelper db;
 
-    EntryAdapter mAdapter;
+    public static EntryAdapter mAdapter;
     ListView list;
 
     CompoundButton.OnCheckedChangeListener mOnCheckedChangeListener;
@@ -109,15 +111,13 @@ public class MainActivity extends FragmentActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        dayList = new DayList();
 
-        if (savedInstanceState != null){
-            // load data and replace this
-            Log.e(TAG,"Saved state found, but no way to restore it yet");
-            dayList = new DayList();
-        }else{
-            Log.d(TAG, "No saved data found");
-            dayList = new DayList();
-        }
+        db = new DatabaseHelper(this);
+        // Reading all added days
+        Log.d(TAG, "Reading "+db.getDayCount()+" entries from database");
+        // This list is for debugging purposes to see what was added
+        List<DayList.Day> contacts = db.getAllDays();
 
         setContentView(R.layout.activity_main);
 
@@ -129,10 +129,6 @@ public class MainActivity extends FragmentActivity {
 
         mAdapter = new EntryAdapter(getApplicationContext());
         list = (ListView)findViewById(R.id.list);
-//
-//        TextView footerView = (TextView) getLayoutInflater().inflate(R.layout.footer_view, null);
-//        list.addFooterView(footerView);
-//        list.setAdapter(mAdapter);
     }
 
     @Override
@@ -319,7 +315,6 @@ public class MainActivity extends FragmentActivity {
         TextView dateView = (TextView) findViewById(R.id.dateView);
     }
 
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent){
         if (resultCode == RESULT_OK){
@@ -332,24 +327,45 @@ public class MainActivity extends FragmentActivity {
                     Log.d(TAG, "Setting goal as " + goalInput);
                     this.goal = goalInput;
 
-                    updateFragments();
+                    // updates display
+                    mPager.setAdapter(mPagerAdapter);
                 }
 
             }else if(requestCode == ADD_REQUEST) {
-                Log.d(TAG, "revieved new data to the main activity");
-                Meal meal = new Meal(intent);
-                mAdapter.add(meal);
-                DayList.Day day = dayList.find(today);
+                Log.d(TAG, "received new data to the main activity");
 
-                if (day == null){
-                    Log.d(TAG, "Could not find day, must create one");
-                    day = dayList.createNewDay(today);
+                if (intent.getStringExtra("Checked") != null ) {
+                    Meal meal = new Meal(intent);
+                    mAdapter.add(meal);
+
+                    if (intent.getStringExtra("Checked").equals("true")) {
+                        if (mAdapter.getFavoriteItemByLabel(meal.getName()) == null) {
+                            mAdapter.addFavorite(meal);
+                        }
+                    }
+
+                    DayList.Day day = dayList.find(today);
+
+                    if (day == null) {
+                        Log.d(TAG, "Could not find day, must create one");
+                        day = dayList.createNewDay(today);
+                    }
+
+                    day.addMeal(intent);
+
+                } else { //Add Exercise
+                    DayList.Day day = dayList.find(today);
+
+                    if (day == null) {
+                        Log.d(TAG, "Could not find day, must create one");
+                        day = dayList.createNewDay(today);
+                    }
+
+                    day.addExercise(intent);
                 }
 
-                day.addMeal(intent);
-
                 Log.d(TAG, "Updating display to include new data");
-                updateFragments();
+                mPager.setAdapter(mPagerAdapter);
             }else{
                 Log.e(TAG, "Unknown result code");
             }
@@ -359,7 +375,6 @@ public class MainActivity extends FragmentActivity {
     }
 
     public static void updateFragments(){
-        Log.d(TAG,"Updating Fragments");
         mPager.setAdapter(mPagerAdapter);
     }
 }
